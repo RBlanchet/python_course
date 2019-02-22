@@ -11,11 +11,23 @@ from sklearn.feature_extraction.text import TfidfVectorizer
 
 import spacy
 import pprint
+import sys
 
 ####### CONSTANTE ##############
-nlp_french = spacy.load('fr')
-french_lemmatizer = LefffLemmatizer()
-nlp_french.add_pipe(french_lemmatizer, name='lefff', before="ner")
+# soup = BeautifulSoup(sys.argv[1])
+# for tag in soup.find_all("meta"):
+#     if tag.get("property", None) == "og:title":
+#         print tag.get("content", None)
+#     elif tag.get("property", None) == "og:url":
+#         print tag.get("content", None)
+# # lang = "en"
+# # if resp.headers['lang'] == "en":
+# # 	lang = "en"
+# # elif resp.headers['lang'] == "fr":
+# # 	lang = "fr"
+# # nlp_lang = spacy.load(lang)
+# # lang_lemmatizer = LefffLemmatizer()
+# # nlp_lang.add_pipe(lang_lemmatizer, name='lefff', before="ner")
 
 class Site(object):
 	"""dans site: mot clef, urls interne, url externe, nom de domaine, document_matrix"""
@@ -75,8 +87,9 @@ class Page(object):
 		try:
 			r = requests.get(self.url)
 			s = BeautifulSoup(r.text, 'lxml')
-			print("code de la requête", r.status_code, " page: ", s.title)
-			return s, r.status_code
+			print(s)
+			# print("code de la requête", r.status_code, " page: ", s.title)
+			# return s, r.status_code
 		except: 
 			print("something went wrong. HTTP request code: {}".format(r.status_code))
 
@@ -119,7 +132,7 @@ class Page(object):
 		#print(lemmes)	
 
 	def get_entity(self): 
-		doc = nlp_french(self.text)
+		doc = nlp_lang(self.text)
 
 		self.entities = []
 		for entity in doc.ents:
@@ -128,7 +141,10 @@ class Page(object):
 
 # apply this to all n top resuslts
 def main(): 
-	site = Site("https://www.it-akademy.fr/")
+	siteUrl = sys.argv[1]
+	if siteUrl is None:
+		siteUrl = "https://www.it-akademy.fr/"
+	site = Site(siteUrl)
 	site.scrap_site()
 	
 	#page = site.factory_page("https://fr.wikipedia.org/wiki/Guerre_d%27ind%C3%A9pendance_des_%C3%89tats-Unis")
